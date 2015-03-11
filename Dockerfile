@@ -4,17 +4,33 @@ MAINTAINER Jakub Filak
 
 ENV container docker
 
-RUN yum -y update; yum -y install abrt-tui abrt-addon-ccpp abrt-addon-kerneloops abrt-addon-vmcore abrt-dbus libreport-fedora libreport-plugin-\* gdb ; yum clean all
+RUN curl -o /etc/yum.repos.d/jfilak-abrt-atomic.repo https://copr.fedoraproject.org/coprs/jfilak/abrt-atomic/repo/fedora-22/jfilak-abrt-atomic-fedora-22.repo
+RUN yum --releasever=22 -y update; yum --releasever=22 -y install git sendmail abrt-tui abrt-addon-ccpp abrt-addon-kerneloops abrt-addon-vmcore abrt-dbus libreport-fedora libreport-plugin-\* gdb ; yum clean all
 
 LABEL Version=1.0
 
-LABEL RUN="docker run -d --privileged --name NAME \
--v /var/tmp/abrt:/var/tmp/abrt \
--v /var/run:/var/run \
--v /:/host \
--e HOST=/host -e IMAGE=IMAGE -e NAME=NAME \
---net=host \
---restart=always \
-IMAGE abrtd"
+RUN sed 's/\(abrt-action-save-package-data\)/\1 -r \/host/' -i /etc/libreport/events.d/abrt_event.conf
 
-ENTRYPOINT /usr/sbin/abrtd
+LABEL RUN="docker run -d --privileged --name NAME \
+-v /var/tmp:/var/tmp \
+-v /var/run:/var/run \
+-v /var/log:/var/log \
+-v /var/lib/abrt:/var/lib/abrt \
+-v /:/host \
+-e HOST=/host' \
+-e IMAGE=IMAGE \
+-e NAME=NAME \
+--pid=host \
+--net=host \
+IMAGE"
+
+RUN git clone https://github.com/abrt/cockpit-abrt.git /usr/local/share/cockpit
+
+ADD abrt-install.sh /usr/local/bin/abrt-install.sh
+ADD abrt-uninstall.sh /usr/local/bin/abrt-uninstall.sh
+ADD abrt-default-cmd.sh /usr/local/bin/abrt-default-cmd.sh
+
+RUN chmod +x /usr/local/bin/abrt-install.sh
+RUN chmod +x /usr/local/bin/abrt-default-cmd.sh
+
+CMD /usr/local/bin/abrt-default-cmd.sh
