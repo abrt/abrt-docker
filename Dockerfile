@@ -42,6 +42,7 @@ ADD abrt-uninstall.sh /usr/local/bin/abrt-uninstall.sh
 ADD abrt-default-cmd.sh /usr/local/bin/abrt-default-cmd.sh
 
 RUN chmod +x /usr/local/bin/abrt-install.sh
+RUN chmod +x /usr/local/bin/abrt-uninstall.sh
 RUN chmod +x /usr/local/bin/abrt-default-cmd.sh
 
 CMD /usr/local/bin/abrt-default-cmd.sh
