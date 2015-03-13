@@ -12,8 +12,8 @@ LABEL Version=1.0
 RUN sed 's/\(abrt-action-save-package-data\)/\1 -r \/host/' -i /etc/libreport/events.d/abrt_event.conf
 RUN sed 's/\(abrt-action-save-kernel-data\)/\1 -r \/host/' -i /etc/libreport/events.d/koops_event.conf
 RUN sed 's/\(abrt-action-save-container-data\)/\1 -r \/host/' -i /etc/libreport/events.d/abrt_event.conf
-RUN sed 's/\(journalctl --system\).*/\1 -m /' -i /etc/libreport/events.d/ccpp_event.conf
-RUN sed 's/\(journalctl -b\).*/\1 -m /' -i /etc/libreport/events.d/ccpp_event.conf
+RUN sed 's/\(journalctl --system\)/\1 -m /' -i /etc/libreport/events.d/ccpp_event.conf
+RUN sed 's/\(journalctl.*-b\)/\1 -m /' -i /etc/libreport/events.d/ccpp_event.conf
 RUN sed 's/\(OpenGPGCheck *=\).*/\1 no/' -i /etc/abrt/abrt-action-save-package-data.conf
 
 LABEL RUN="docker run -d --privileged --name NAME \
