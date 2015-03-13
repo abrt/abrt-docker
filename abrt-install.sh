@@ -3,8 +3,8 @@
 
 mkdir -p /host/var/lib/abrt
 
-mkdir -p /host/usr/local/share/cockpit/
-cp -r /usr/local/share/cockpit/abrt/ /host/usr/local/share/cockpit/abrt/
+mkdir -p /host/usr/local/share/cockpit
+cp -r /usr/local/share/cockpit/abrt /host/usr/local/share/cockpit
 
 cp /etc/dbus-1/system.d/dbus-abrt.conf /host/etc/dbus-1/system.d/dbus-abrt.conf || exit 1
 cp /etc/dbus-1/system.d/org.freedesktop.problems.daemon.conf /host/etc/dbus-1/system.d/org.freedesktop.problems.daemon.conf || exit 1
