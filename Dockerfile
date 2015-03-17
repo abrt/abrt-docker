@@ -35,7 +35,7 @@ LABEL RUN="docker run -d --privileged --name NAME \
 --net=host \
 IMAGE"
 
-RUN git clone https://github.com/abrt/cockpit-abrt.git /usr/local/share/cockpit
+RUN git clone --depth=1 --single-branch -b master https://github.com/abrt/cockpit-abrt.git /usr/local/share/cockpit
 
 ADD abrt-install.sh /usr/local/bin/abrt-install.sh
 ADD abrt-uninstall.sh /usr/local/bin/abrt-uninstall.sh
