@@ -13,15 +13,15 @@ Features
 
 Installation
 ------------
-# docker run --rm -v /:/host IMAGE /usr/local/bin/abrt-install.sh
+# docker run --rm --privileged -v /:/host IMAGE /usr/local/bin/abrt-install.sh
 
 Un-installation
 ---------------
-# docker run --rm -v /:/host IMAGE /usr/local/bin/abrt-uninstall.sh
+# docker run --rm --privileged -v /:/host IMAGE /usr/local/bin/abrt-uninstall.sh
 
 Run
 ---
-# docker run --rm -d --privileged -v /var/tmp:/var/tmp -v /var/run:/var/run -v /var/log:/var/log -v /var/lib/abrt:/var/lib/abrt -v /:/host --pid=host --net=host --name NAME IMAGE
+# docker run -d --privileged -v /var/tmp:/var/tmp -v /var/run:/var/run -v /var/log:/var/log -v /var/lib/abrt:/var/lib/abrt -v /:/host --pid=host --net=host --name NAME IMAGE
 
 Configuration
 -------------

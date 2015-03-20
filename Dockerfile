@@ -16,10 +16,10 @@ RUN sed 's/\(journalctl --system\)/\1 -m /' -i /etc/libreport/events.d/ccpp_even
 RUN sed 's/\(journalctl.*-b\)/\1 -m /' -i /etc/libreport/events.d/ccpp_event.conf
 RUN sed 's/\(OpenGPGCheck *=\).*/\1 no/' -i /etc/abrt/abrt-action-save-package-data.conf
 
-LABEL INSTALL="docker run --rm -v /:/host IMAGE \
+LABEL INSTALL="docker run --privileged --rm -v /:/host IMAGE \
 /usr/local/bin/abrt-install.sh"
 
-LABEL UNINSTALL="docker run --rm -v /:/host IMAGE \
+LABEL UNINSTALL="docker run --privileged --rm -v /:/host IMAGE \
 /usr/local/bin/abrt-uninstall.sh"
 
 LABEL RUN="docker run -d --privileged --name NAME \
