@@ -24,7 +24,7 @@ LABEL UNINSTALL="docker run --privileged --rm -v /:/host IMAGE \
 
 LABEL RUN="docker run -d --privileged --name NAME \
 -v /var/tmp:/var/tmp \
--v /var/run:/var/run \
+-v /run:/run \
 -v /var/log:/var/log \
 -v /var/lib/abrt:/var/lib/abrt \
 -v /:/host \
