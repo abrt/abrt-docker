@@ -1,11 +1,13 @@
-FROM fedora:latest
+#FROM fedora:latest
+FROM docker.io/Fedora-Docker-Base-22_Alpha-20150305.x86_64
 
 MAINTAINER Jakub Filak
 
 ENV container docker
 
+#RUN dnf copr enable -y jfilak/abrt-atomic
 RUN curl -o /etc/yum.repos.d/jfilak-abrt-atomic.repo https://copr.fedoraproject.org/coprs/jfilak/abrt-atomic/repo/fedora-22/jfilak-abrt-atomic-fedora-22.repo
-RUN yum --releasever=22 -y update; yum --releasever=22 -y install git sendmail abrt-tui abrt-addon-ccpp abrt-addon-kerneloops abrt-addon-vmcore abrt-dbus libreport-fedora libreport-plugin-\* gdb ; yum clean all
+RUN yum --releasever=22 -y update; dnf --releasever=22 -y install git sendmail abrt-tui abrt-addon-ccpp abrt-addon-kerneloops abrt-addon-vmcore abrt-dbus libreport-fedora libreport-plugin-\* gdb ; dnf clean all
 
 LABEL Version=1.0
 
