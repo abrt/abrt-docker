@@ -7,7 +7,7 @@ ENV container docker
 
 #RUN dnf copr enable -y jfilak/abrt-atomic
 RUN curl -o /etc/yum.repos.d/jfilak-abrt-atomic.repo https://copr.fedoraproject.org/coprs/jfilak/abrt-atomic/repo/fedora-22/jfilak-abrt-atomic-fedora-22.repo
-RUN yum --releasever=22 -y update; dnf --releasever=22 -y install git sendmail abrt-tui abrt-addon-ccpp abrt-addon-kerneloops abrt-addon-vmcore abrt-dbus libreport-fedora libreport-plugin-\* gdb ; dnf clean all
+RUN yum --releasever=22 -y update; dnf --releasever=22 -y install supervisor git sendmail abrt-tui abrt-addon-ccpp abrt-addon-kerneloops abrt-addon-vmcore abrt-dbus libreport-fedora libreport-plugin-\* gdb ; dnf clean all
 
 LABEL Version=1.0
 
@@ -40,10 +40,10 @@ RUN git clone --depth=1 --single-branch -b master https://github.com/abrt/cockpi
 
 ADD abrt-install.sh /usr/local/bin/abrt-install.sh
 ADD abrt-uninstall.sh /usr/local/bin/abrt-uninstall.sh
-ADD abrt-default-cmd.sh /usr/local/bin/abrt-default-cmd.sh
 
 RUN chmod +x /usr/local/bin/abrt-install.sh
 RUN chmod +x /usr/local/bin/abrt-uninstall.sh
-RUN chmod +x /usr/local/bin/abrt-default-cmd.sh
 
-CMD /usr/local/bin/abrt-default-cmd.sh
+ADD supervisord.ini /etc/supervisord.d/supervisord.ini
+
+CMD /usr/bin/supervisord
