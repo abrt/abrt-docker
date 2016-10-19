@@ -1,0 +1,64 @@
+#!/bin/sh
+
+SAVEDCOREPATTERN=/var/run/abrt/saved_core_pattern
+
+function check_abrtd_health
+{
+    ABRTD_EXE=$(readlink /proc/${ABRTD_PID}/exe) || return 1
+    test "/usr/sbin/abrtd" == "$ABRTD_EXE" || return 2
+}
+
+function dump
+{
+    nsenter -t ${ABRTD_PID} -m -u -i -n -p -C -r -w \
+        /usr/libexec/abrt-hook-ccpp $1 $2 $3 $4 $5 $6 $7 $8 $9
+}
+
+function container_root
+{
+    # The variable should hold value like "SOURCE=... FSROOT=..."
+    ROOTINFO=$(findmnt -n -v -P -o SOURCE,FSROOT -T /) || return 1
+    eval "$ROOTINFO" || return 2
+    CONTAINERROOT=$(findmnt -n -N 1 -o TARGET -S $SOURCE)$FSROOT || return 3
+}
+
+function install
+{
+    container_root || return $(($? + 2))
+    mkdir -p /host/var/run/abrt
+    ln -sf ${CONTAINERROOT}/usr/local/bin/abrt-container-coredump /host/var/run/abrt/abrt-container-coredump
+    cp /proc/sys/kernel/core_pattern ${SAVEDCOREPATTERN} || return 1
+    echo "|/var/run/abrt/abrt-container-coredump --dump ${ABRTD_PID} %s %c %p %u %g %t %P %I"
+    echo "|/var/run/abrt/abrt-container-coredump --dump ${ABRTD_PID} %s %c %p %u %g %t %P %I" > /proc/sys/kernel/core_pattern || return 2
+}
+
+function uninstall
+{
+    container_root
+    if [ -f ${CONTAINERROOT}${SAVEDCOREPATTERN} ]; then
+        sysctl kernel.core_pattern=$(cat ${CONTAINERROOT}${SAVEDCOREPATTERN})
+        rm ${CONTAINERROOT}${SAVEDCOREPATTERN}
+    fi
+}
+
+case $1 in
+    "--install")
+        ABRTD_PID=$(cat /var/run/abrt/abrtd.pid)
+        check_abrtd_health || exit $(($? + 10))
+        install || exit $(($? + 20))
+        ;;
+    "--uninstall")
+        uninstall
+        ;;
+    "--dump")
+        shift
+        ABRTD_PID=$1
+        shift
+        check_abrtd_health || exit $(($? + 10))
+        dump $@ || exit $(($? + 20))
+        ;;
+    "--help"|*)
+        echo "Usage:"
+        echo " $0 [--install] [--uninstall] [--dump ABRTD_PID OPTIONS]"
+        ;;
+esac
