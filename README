@@ -1,15 +1,12 @@
 ABRT Docker container
 =====================
 
-This image expects that the host have 'abrt-atomic' package installed and
-'abrt-coredump-helper' service is running.
-
 Features
 --------
-* Processes core dump files stored by 'abrt-credump-helper'
-* Detects Kernel oopses in journalctl
-* Provides a Cockpit module called 'Problems'
-* Sends e-mail notifications
+* Detection of core dump files
+* Detection of kernel oopses in journalctl
+* Detection of kernel vmcores on host's file system
+* E-mail notifications
 
 Installation
 ------------
@@ -26,7 +23,3 @@ Run
 Configuration
 -------------
 Pass `-e ABRT_VERBOSE=NUM` on the run command line to make abrt producing more logs.
-
-TODO
-----
-* Add support for vmcores
