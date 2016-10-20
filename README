@@ -21,7 +21,7 @@ Un-installation
 
 Run
 ---
-# docker run -d --privileged -v /var/tmp:/var/tmp -v /run:/run -v /var/log:/var/log -v /var/lib/abrt:/var/lib/abrt -v /:/host --pid=host --net=host --name NAME IMAGE
+# docker run -d --privileged -v /dev/log:/dev/log -v /var/run/systemd/journal/socket:/var/run/systemd/journal/socket -v /:/host -v /var/run/abrt:/var/run/abrt --pid=host --net=host --name NAME IMAGE
 
 Configuration
 -------------
