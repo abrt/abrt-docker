@@ -1,0 +1,24 @@
+#!/bin/sh
+
+FILE=$1
+shift
+
+TO=5
+if [ "$1" == "--timeout" ]; then
+    shift
+    TO=$1
+    shift
+fi
+TO=$((TO*10))
+
+I=0
+while [ ! -f $FILE ]; do
+    sleep 0.1
+    I=$((I+1))
+    if [ $I -ge $TO ]; then
+        echo "$FILE didn't appear in $((TO/10))s"
+        exit 1
+    fi
+done
+
+exec $@
