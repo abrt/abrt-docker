@@ -8,14 +8,6 @@ Features
 * Detection of kernel vmcores on host's file system
 * E-mail notifications
 
-Installation
-------------
-# docker run --rm --privileged -v /:/host IMAGE /usr/local/bin/abrt-install.sh
-
-Un-installation
----------------
-# docker run --rm --privileged -v /:/host IMAGE /usr/local/bin/abrt-uninstall.sh
-
 Run
 ---
 # docker run -d --privileged -v /dev/log:/dev/log -v /var/run/systemd/journal/socket:/var/run/systemd/journal/socket -v /:/host -v /var/run/abrt:/var/run/abrt --pid=host --net=host --name NAME IMAGE

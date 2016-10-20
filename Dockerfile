@@ -1,6 +1,6 @@
 FROM fedora:24
 
-MAINTAINER Jakub Filak <filak.jakub@gmail.com>
+MAINTAINER Jakub Filak <jfilak@redhat.com>
 
 ENV container docker
 
@@ -17,12 +17,6 @@ RUN sed 's/\(journalctl.*-b\)/\1 -D \/host\/var\/log\/journal /' -i /etc/librepo
 RUN augtool set /files/etc/abrt/plugins/CCpp.conf/CreateCoreBacktrace no
 RUN augtool set /files/etc/abrt/abrt-action-save-package-data.conf/OpenGPGCheck no
 
-LABEL INSTALL="docker run --privileged --rm -v /:/host IMAGE \
-/usr/local/bin/abrt-install.sh"
-
-LABEL UNINSTALL="docker run --privileged --rm -v /:/host IMAGE \
-/usr/local/bin/abrt-uninstall.sh"
-
 LABEL RUN="docker run -d --privileged --name NAME \
 -v /:/host \
 -v /dev/log:/dev/log \
@@ -35,13 +29,9 @@ LABEL RUN="docker run -d --privileged --name NAME \
 --net=host \
 IMAGE"
 
-ADD abrt-install.sh /usr/local/bin/abrt-install.sh
-ADD abrt-uninstall.sh /usr/local/bin/abrt-uninstall.sh
 ADD abrt-container-coredump /usr/local/bin/abrt-container-coredump
 ADD after-file /usr/local/bin/after-file
 
-RUN chmod +x /usr/local/bin/abrt-install.sh
-RUN chmod +x /usr/local/bin/abrt-uninstall.sh
 RUN chmod +x /usr/local/bin/abrt-container-coredump
 RUN chmod +x /usr/local/bin/after-file
 RUN mkdir -p /run/dbus
