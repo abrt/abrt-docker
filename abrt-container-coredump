@@ -1,11 +1,19 @@
 #!/bin/sh
 
 SAVEDCOREPATTERN=/var/run/abrt/saved_core_pattern
+ABRTDPIDFILE=/var/run/abrt/abrtd.pid
 
 function check_abrtd_health
 {
-    ABRTD_EXE=$(readlink /proc/${ABRTD_PID}/exe) || return 1
-    test "/usr/sbin/abrtd" == "$ABRTD_EXE" || return 2
+    ABRTD_EXE=$(readlink /proc/${ABRTD_PID}/exe) || {
+        echo "stalled abrtd.pid file - the process does not exist"
+        return 1
+    }
+
+    test "/usr/sbin/abrtd" == "$ABRTD_EXE" || {
+        echo "stalled abrtd.pid file - the process is not /usr/sbin/abrtd"
+        return 2
+    }
 }
 
 function dump
@@ -17,16 +25,24 @@ function dump
 function container_root
 {
     # The variable should hold value like "SOURCE=... FSROOT=..."
-    ROOTINFO=$(findmnt -n -v -P -o SOURCE,FSROOT -T /) || return 1
-    eval "$ROOTINFO" || return 2
-    CONTAINERROOT=$(findmnt -n -N 1 -o TARGET -S $SOURCE)$FSROOT || return 3
+    ROOTINFO=$(findmnt -n -v -P -o SOURCE,FSROOT -T /) || {
+        echo "cannot find source file system for the root"
+        return 1
+    }
+    eval "$ROOTINFO" || {
+        echo "unexpected return value from the findmnt utility"
+        return 2
+    }
+    CONTAINERROOT=$(findmnt -n -N 1 -o TARGET -S $SOURCE)$FSROOT || {
+        echo "cannot find the host target directory for the root file system"
+        return 3
+    }
 }
 
 function install
 {
     container_root || return $(($? + 2))
-    mkdir -p /host/var/run/abrt
-    ln -sf ${CONTAINERROOT}/usr/local/bin/abrt-container-coredump /host/var/run/abrt/abrt-container-coredump
+    ln -sf ${CONTAINERROOT}/usr/local/bin/abrt-container-coredump /var/run/abrt/abrt-container-coredump
     cp /proc/sys/kernel/core_pattern ${SAVEDCOREPATTERN} || return 1
     echo "|/var/run/abrt/abrt-container-coredump --dump ${ABRTD_PID} %s %c %p %u %g %t %P %I"
     echo "|/var/run/abrt/abrt-container-coredump --dump ${ABRTD_PID} %s %c %p %u %g %t %P %I" > /proc/sys/kernel/core_pattern || return 2
@@ -43,7 +59,7 @@ function uninstall
 
 case $1 in
     "--install")
-        ABRTD_PID=$(cat /var/run/abrt/abrtd.pid)
+        ABRTD_PID=$(cat $ABRTDPIDFILE)
         check_abrtd_health || exit $(($? + 10))
         install || exit $(($? + 20))
         ;;
