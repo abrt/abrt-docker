@@ -1,20 +1,21 @@
-FROM fedora:latest
+FROM fedora:24
 
 MAINTAINER Jakub Filak <filak.jakub@gmail.com>
 
 ENV container docker
 
-RUN dnf -y update; dnf -y install supervisor git sendmail abrt-tui abrt-cli-ng abrt-addon-ccpp abrt-addon-kerneloops abrt-addon-vmcore abrt-dbus libreport-fedora libreport-plugin-\* gdb augeas; dnf clean all
+RUN curl -o /etc/yum.repos.d/abrt-devel-fedora-25.repo https://copr.fedorainfracloud.org/coprs/g/abrt/devel/repo/fedora-25/group_abrt-devel-fedora-25.repo
+RUN dnf update -y fedora-repos; rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-25-$(uname -i); dnf --releasever=25 -y update; dnf --releasever=25 -y install supervisor git sendmail abrt-cli-ng abrt-addon-ccpp abrt-addon-kerneloops abrt-addon-vmcore abrt-dbus gdb augeas; dnf clean all
 
 LABEL Version=2.0
 
 RUN sed 's/\(abrt-action-save-package-data\)/\1 -r \/host/' -i /etc/libreport/events.d/abrt_event.conf
-RUN sed 's/\(abrt-action-save-kernel-data\)/\1 -r \/host/' -i /etc/libreport/events.d/koops_event.conf
 RUN sed 's/\(abrt-action-save-container-data\)/\1 -r \/host/' -i /etc/libreport/events.d/abrt_event.conf
 RUN sed 's/\(journalctl \)--system/\1 -D \/host\/var\/log\/journal /' -i /etc/libreport/events.d/ccpp_event.conf
 RUN sed 's/\(journalctl.*-b\)/\1 -D \/host\/var\/log\/journal /' -i /etc/libreport/events.d/ccpp_event.conf
 
 RUN augtool set /files/etc/abrt/plugins/CCpp.conf/CreateCoreBacktrace no
+RUN augtool set /files/etc/abrt/abrt-action-save-package-data.conf/OpenGPGCheck no
 
 LABEL INSTALL="docker run --privileged --rm -v /:/host IMAGE \
 /usr/local/bin/abrt-install.sh"
@@ -23,8 +24,10 @@ LABEL UNINSTALL="docker run --privileged --rm -v /:/host IMAGE \
 /usr/local/bin/abrt-uninstall.sh"
 
 LABEL RUN="docker run -d --privileged --name NAME \
--v /dev/log:/dev/log \
 -v /:/host \
+-v /dev/log:/dev/log \
+-v /var/run/abrt:/var/run/abrt \
+-v /var/run/systemd/journal/socket:/var/run/systemd/journal/socket \
 -e HOST=/host' \
 -e IMAGE=IMAGE \
 -e NAME=NAME \
@@ -32,15 +35,15 @@ LABEL RUN="docker run -d --privileged --name NAME \
 --net=host \
 IMAGE"
 
-RUN git clone --depth=1 --single-branch -b master https://github.com/abrt/cockpit-abrt.git /usr/local/share/cockpit
-
 ADD abrt-install.sh /usr/local/bin/abrt-install.sh
 ADD abrt-uninstall.sh /usr/local/bin/abrt-uninstall.sh
 ADD abrt-container-coredump /usr/local/bin/abrt-container-coredump
+ADD after-file /usr/local/bin/after-file
 
 RUN chmod +x /usr/local/bin/abrt-install.sh
 RUN chmod +x /usr/local/bin/abrt-uninstall.sh
 RUN chmod +x /usr/local/bin/abrt-container-coredump
+RUN chmod +x /usr/local/bin/after-file
 RUN mkdir -p /run/dbus
 
 ADD supervisord.ini /etc/supervisord.d/supervisord.ini
