@@ -38,4 +38,4 @@ RUN mkdir -p /run/dbus
 
 ADD supervisord.ini /etc/supervisord.d/supervisord.ini
 
-CMD /usr/bin/supervisord
+CMD /usr/bin/supervisord -c /etc/supervisord.d/supervisord.ini
