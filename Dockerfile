@@ -4,8 +4,10 @@ MAINTAINER Jakub Filak <jfilak@redhat.com>
 
 ENV container docker
 
+RUN dnf clean all && dnf update -y fedora-repos
+RUN rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-25-$(uname -i) && dnf --releasever=25 -y update
 RUN curl -o /etc/yum.repos.d/abrt-devel-fedora-25.repo https://copr.fedorainfracloud.org/coprs/g/abrt/devel/repo/fedora-25/group_abrt-devel-fedora-25.repo
-RUN dnf update -y fedora-repos; rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-25-$(uname -i); dnf --releasever=25 -y update; dnf --releasever=25 -y install supervisor git sendmail abrt-cli-ng abrt-addon-ccpp abrt-addon-kerneloops abrt-addon-vmcore abrt-dbus gdb augeas; dnf clean all
+RUN dnf --releasever=25 -y install supervisor git sendmail abrt-cli-ng abrt-addon-ccpp abrt-addon-kerneloops abrt-addon-vmcore libreport-plugin-mailx libreport-plugin-reportuploader libreport-plugin-logger abrt-dbus gdb augeas; dnf clean all
 
 LABEL Version=2.0
 
@@ -16,6 +18,12 @@ RUN sed 's/\(journalctl.*-b\)/\1 -D \/host\/var\/log\/journal /' -i /etc/librepo
 
 RUN augtool set /files/etc/abrt/plugins/CCpp.conf/CreateCoreBacktrace no
 RUN augtool set /files/etc/abrt/abrt-action-save-package-data.conf/OpenGPGCheck no
+
+# Until the issue below is fixed, we must enable events using sed.
+# https://github.com/abrt/abrt/issues/1194
+RUN sed 's/# EVENT/EVENT/' -i /etc/libreport/workflows.d/report_mailx.conf
+RUN sed 's/# EVENT/EVENT/' -i /etc/libreport/workflows.d/report_logger.conf
+RUN sed 's/# EVENT/EVENT/' -i /etc/libreport/workflows.d/report_uploader.conf
 
 LABEL RUN="docker run -d --privileged --name NAME \
 -v /:/host \
