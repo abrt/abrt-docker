@@ -12,6 +12,10 @@ Run
 ---
 # docker run -d --privileged -v /dev/log:/dev/log -v /var/run/systemd/journal/socket:/var/run/systemd/journal/socket -v /:/host -v /var/run/abrt:/var/run/abrt --pid=host --net=host --name NAME IMAGE
 
+Usage
+-----
+# docker exec -it NAME abrt
+
 Configuration
 -------------
 Pass `-e ABRT_VERBOSE=NUM` on the run command line to make abrt producing more logs.
