@@ -29,13 +29,13 @@ LABEL RUN="docker run -d --privileged --name NAME \
 --net=host \
 IMAGE"
 
-ADD abrt-container-coredump /usr/local/bin/abrt-container-coredump
-ADD after-file /usr/local/bin/after-file
+ADD bin/abrt-container-coredump /usr/local/bin/abrt-container-coredump
+ADD bin/after-file /usr/local/bin/after-file
 
 RUN chmod +x /usr/local/bin/abrt-container-coredump
 RUN chmod +x /usr/local/bin/after-file
 RUN mkdir -p /run/dbus
 
-ADD supervisord.ini /etc/supervisord.d/supervisord.ini
+ADD etc/supervisord.ini /etc/supervisord.d/supervisord.ini
 
 CMD /usr/bin/supervisord -c /etc/supervisord.d/supervisord.ini
