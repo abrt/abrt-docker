@@ -3,7 +3,7 @@
 SAVEDCOREPATTERN=/var/run/abrt/saved_core_pattern
 ABRTDPIDFILE=/var/run/abrt/abrtd.pid
 
-function check_abrtd_health
+check_abrtd_health()
 {
     ABRTD_EXE=$(readlink /proc/${ABRTD_PID}/exe) || {
         echo "stalled abrtd.pid file - the process does not exist"
@@ -16,7 +16,7 @@ function check_abrtd_health
     }
 }
 
-function dump
+dump()
 {
     # abrt-hook-ccpp must be the only process that keeps STDIN open,
     # therefore we must use 'exec nsenter ...' and '--no-fork'
@@ -24,7 +24,7 @@ function dump
         /usr/libexec/abrt-hook-ccpp $1 $2 $3 $4 $5 $6 $7 $8 $9
 }
 
-function container_root
+container_root()
 {
     # The variable should hold value like "SOURCE=... FSROOT=..."
     ROOTINFO=$(findmnt -n -v -P -o SOURCE,FSROOT -T /) || {
@@ -41,7 +41,7 @@ function container_root
     }
 }
 
-function install
+install()
 {
     container_root || return $(($? + 2))
     ln -sf ${CONTAINERROOT}/usr/local/bin/abrt-container-coredump /var/run/abrt/abrt-container-coredump
@@ -50,7 +50,7 @@ function install
     echo "|/var/run/abrt/abrt-container-coredump --dump ${ABRTD_PID} %s %c %p %u %g %t %P %I" > /proc/sys/kernel/core_pattern || return 2
 }
 
-function uninstall
+uninstall()
 {
     container_root
     if [ -f ${CONTAINERROOT}${SAVEDCOREPATTERN} ]; then
