@@ -1,0 +1,31 @@
+#!/bin/sh
+
+set -o errexit
+
+usage_and_exit()
+{
+    cat <<EOF
+Usage:
+  $0 DIRECTORY
+EOF
+    exit $1
+}
+
+if [ -z "$1" ]; then
+    echo "No build target"
+    usage_and_exit 1
+fi
+
+set -o nounset
+
+if [ ! -e $1 ]; then
+    echo "Build target $1 does not exist"
+    usage_and_exit 1
+fi
+
+if [ ! -e $1/Dockerfile ]; then
+    echo "Build target $1 does not include Dockerfile"
+    usage_and_exit 1
+fi
+
+docker build -t $(basename "$1") --no-cache --force-rm "$1"
