@@ -16,7 +16,6 @@ RUN sed 's/\(abrt-action-save-container-data\)/\1 -r \/host/' -i /etc/libreport/
 RUN sed 's/\(journalctl \)--system/\1 -D \/host\/var\/log\/journal /' -i /etc/libreport/events.d/ccpp_event.conf
 RUN sed 's/\(journalctl.*-b\)/\1 -D \/host\/var\/log\/journal /' -i /etc/libreport/events.d/ccpp_event.conf
 
-RUN augtool set /files/etc/abrt/plugins/CCpp.conf/CreateCoreBacktrace no
 RUN augtool set /files/etc/abrt/abrt-action-save-package-data.conf/OpenGPGCheck no
 
 # Until the issue below is fixed, we must enable events using sed.
