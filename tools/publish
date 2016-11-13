@@ -2,12 +2,13 @@
 
 set -o errexit
 
-usage()
+usage_and_exit()
 {
     cat <<EOF
 Usage:
-  $0 DIRECTORY TAG
+  $0 DIRECTORY FLAVOR
 EOF
+    exit $1
 }
 
 if [ -z "$1" ]; then
@@ -16,7 +17,7 @@ if [ -z "$1" ]; then
 fi
 
 if [ -z "$2" ]; then
-    echo "Missing tag"
+    echo "Missing FLAVOR"
     usage_and_exit 1
 fi
 
@@ -32,9 +33,10 @@ if [ ! -e $1/Dockerfile ]; then
     usage_and_exit 1
 fi
 
-IMAGE_NAME=$(basename "$1")
-TAG=$2
+NAME=$(basename "$1")
+TAG="$NAME-$2"
+HUB_USER=${DOCKER_USER:-abrt}
 
-docker tag $IMAGE_NAME abrt/$IMAGE_NAME:$TAG
+docker tag abrt-$NAME $HUB_USER/abrt:$TAG
 docker login
-docker push abrt/$IMAGE_NAME
+docker push $HUB_USER/abrt
