@@ -1,4 +1,4 @@
-FROM jfilak/abrt:minimal-fedora-25
+FROM abrt/stack-fedora:25
 
 MAINTAINER Jakub Filak <jfilak@redhat.com>
 
