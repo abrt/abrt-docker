@@ -18,7 +18,7 @@ fi
 
 set -o nounset
 
-if [ ! -e $1 ]; then
+if [ ! -d $1 ]; then
     echo "Build target $1 does not exist"
     usage_and_exit 1
 fi
@@ -28,4 +28,4 @@ if [ ! -e $1/Dockerfile ]; then
     usage_and_exit 1
 fi
 
-docker build -t abrt-$(basename "$1") --no-cache --force-rm "$1"
+sudo docker build -t abrt-$(basename "$1") --no-cache --force-rm "$1"

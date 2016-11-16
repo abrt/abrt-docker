@@ -6,7 +6,7 @@ usage_and_exit()
 {
     cat <<EOF
 Usage:
-  $0 DIRECTORY FLAVOR
+  $0 DIRECTORY TAG TAG ...
 EOF
     exit $1
 }
@@ -16,8 +16,8 @@ if [ -z "$1" ]; then
     usage_and_exit 1
 fi
 
-if [ -z "$2" ]; then
-    echo "Missing FLAVOR"
+if [ $# -lt 2 ]; then
+    echo "Missing TAGs"
     usage_and_exit 1
 fi
 
@@ -33,10 +33,19 @@ if [ ! -e $1/Dockerfile ]; then
     usage_and_exit 1
 fi
 
-NAME=$(basename "$1")
-TAG="$NAME-$2"
-HUB_USER=${DOCKER_USER:-abrt}
+IMAGE_NAME=$(basename "$1")
+HUB_TARGET="${HUB_NS:-abrt}/${HUB_REPOSITORY:-${IMAGE_NAME}}"
 
-docker tag abrt-$NAME $HUB_USER/abrt:$TAG
-docker login
-docker push $HUB_USER/abrt
+shift
+for TAG in $@; do
+    sudo docker tag abrt-$IMAGE_NAME $HUB_TARGET:${TAG}
+    echo "Pushing: $HUB_TARGET:${TAG}"
+done
+
+USER=${HUB_USER:-$(whoami)}
+echo "Logging to hub.docker.com as $USER"
+echo "Hit any key to continue or Ctrl-C to quit"
+read n
+
+sudo docker login -u $USER || exit 1
+sudo docker push $HUB_TARGET
