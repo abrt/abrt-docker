@@ -24,16 +24,14 @@ RUN sed 's/# EVENT/EVENT/' -i /etc/libreport/workflows.d/report_mailx.conf
 RUN sed 's/# EVENT/EVENT/' -i /etc/libreport/workflows.d/report_logger.conf
 RUN sed 's/# EVENT/EVENT/' -i /etc/libreport/workflows.d/report_uploader.conf
 
-LABEL RUN="docker run -d --privileged --name NAME \
+LABEL RUN="docker run -d --privileged \
 -v /:/host \
 -v /dev/log:/dev/log \
 -v /var/run/abrt:/var/run/abrt \
 -v /var/run/systemd/journal/socket:/var/run/systemd/journal/socket \
--e HOST=/host' \
--e IMAGE=IMAGE \
--e NAME=NAME \
 --pid=host \
 --net=host \
+--name NAME \
 IMAGE"
 
 ADD bin/abrt-container-coredump /usr/local/bin/abrt-container-coredump
