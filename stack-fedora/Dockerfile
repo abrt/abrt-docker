@@ -17,6 +17,8 @@ RUN sed 's/\(journalctl \)--system/\1 -D \/host\/var\/log\/journal /' -i /etc/li
 RUN sed 's/\(journalctl.*-b\)/\1 -D \/host\/var\/log\/journal /' -i /etc/libreport/events.d/ccpp_event.conf
 
 RUN augtool set /files/etc/abrt/abrt-action-save-package-data.conf/OpenGPGCheck no
+# To get information about the runtime - e.g. /etc/os-release
+RUN augtool set /files/etc/abrt/abrt.conf/ExploreChroots yes
 
 # Until the issue below is fixed, we must enable events using sed.
 # https://github.com/abrt/abrt/issues/1194
