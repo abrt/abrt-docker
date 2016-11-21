@@ -4,7 +4,7 @@ MAINTAINER Jakub Filak <jfilak@redhat.com>
 
 ENV container docker
 
-RUN dnf --releasever=25 -y install libreport-plugin-bugzilla libreport-fedora; dnf clean all
+RUN dnf --releasever=25 -y install libreport-plugin-bugzilla libreport-fedora abrt-plugin-bodhi; dnf clean all
 
 LABEL Version=2.0
 
