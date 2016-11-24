@@ -44,5 +44,6 @@ RUN chmod +x /usr/local/bin/after-file
 RUN mkdir -p /run/dbus
 
 ADD etc/supervisord.ini /etc/supervisord.d/supervisord.ini
+ADD etc/abrt.sh /etc/profile.d/abrt.sh
 
 CMD /usr/bin/supervisord -c /etc/supervisord.d/supervisord.ini
