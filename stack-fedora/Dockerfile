@@ -1,13 +1,12 @@
-FROM fedora:24
+FROM fedora:25
 
 MAINTAINER Jakub Filak <jfilak@redhat.com>
 
 ENV container docker
 
-RUN dnf clean all && dnf update -y fedora-repos
-RUN rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-25-$(uname -i) && dnf --releasever=25 -y update
+RUN dnf clean all
 RUN curl -o /etc/yum.repos.d/abrt-devel-fedora-25.repo https://copr.fedorainfracloud.org/coprs/g/abrt/devel/repo/fedora-25/group_abrt-devel-fedora-25.repo
-RUN dnf --releasever=25 -y install supervisor git sendmail abrt-cli-ng abrt-addon-ccpp abrt-addon-kerneloops abrt-addon-vmcore libreport-plugin-mailx libreport-plugin-reportuploader libreport-plugin-logger abrt-dbus gdb augeas python3-argcomplete; dnf clean all
+RUN dnf -y install supervisor sendmail abrt-cli-ng abrt-addon-ccpp abrt-addon-kerneloops abrt-addon-vmcore libreport-plugin-mailx libreport-plugin-reportuploader libreport-plugin-logger abrt-dbus gdb augeas python3-argcomplete; dnf clean all
 
 LABEL Version=2.0
 
