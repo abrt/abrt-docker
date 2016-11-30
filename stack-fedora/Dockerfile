@@ -10,15 +10,23 @@ RUN dnf -y install supervisor sendmail abrt-cli-ng abrt-addon-ccpp abrt-addon-ke
 
 LABEL Version=2.0
 
+# Let the ABRT tools know where the rootfs is located.
 RUN sed 's/\(abrt-action-save-package-data\)/\1 -r \/host/' -i /etc/libreport/events.d/abrt_event.conf
 RUN sed 's/\(abrt-action-save-container-data\)/\1 -r \/host/' -i /etc/libreport/events.d/abrt_event.conf
 RUN sed 's/\(journalctl \)--system/\1 -D \/host\/var\/log\/journal /' -i /etc/libreport/events.d/ccpp_event.conf
 RUN sed 's/\(journalctl.*-b\)/\1 -D \/host\/var\/log\/journal /' -i /etc/libreport/events.d/ccpp_event.conf
 
+# Testing signature of packages will not work until we install rpm signature
+# keys of all released Fedoras to the image. Let's turn GPG off for now.
 RUN augtool set /files/etc/abrt/abrt-action-save-package-data.conf/OpenGPGCheck no
-# To get information about the runtime - e.g. /etc/os-release
+
+# To get information about the runtime - e.g. /etc/os-release.
+# The process' /etc/os-release will be copied to
+# the $PROBLEM_DIR/os_info_in_rootdir file.
 RUN augtool set /files/etc/abrt/abrt.conf/ExploreChroots yes
 
+
+# Enable additional reporting workflows.
 # Until the issue below is fixed, we must enable events using sed.
 # https://github.com/abrt/abrt/issues/1194
 RUN sed 's/# EVENT/EVENT/' -i /etc/libreport/workflows.d/report_mailx.conf
@@ -35,6 +43,9 @@ LABEL RUN="docker run -d --privileged \
 --name NAME \
 IMAGE"
 
+# This wrapper script will be installed on the host until kernel allows us to
+# set kernel.core_pattern to a string longer than 128 Bytes.
+# https://bugzilla.redhat.com/1386274
 ADD bin/abrt-container-coredump /usr/local/bin/abrt-container-coredump
 ADD bin/after-file /usr/local/bin/after-file
 

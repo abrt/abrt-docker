@@ -1,4 +1,8 @@
 #!/bin/sh
+# This simple script waits until the given file does not exist and executes the
+# given command once the file got created.
+# The script waits only 5s by default. If the file does not appear in this time
+# period, the script exits with an error.
 
 FILE=$1
 shift

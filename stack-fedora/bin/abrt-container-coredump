@@ -1,4 +1,10 @@
 #!/bin/sh
+# This script is part of ABRT Docker image. Its main purpose is to route core
+# dump files from Kernel to a container hosting ABRT software. To accomplish
+# its task, the script must be given PID of abrtd. The principle of the core
+# dump file routing is to enter Namespaces of the abrtd process and execute
+# the  /usr/bin/abrt-hook-ccpp binary. The binary cannot be executed directly
+# by Kernel due to its dependencies.
 
 SAVEDCOREPATTERN=/var/run/abrt/saved_core_pattern
 ABRTDPIDFILE=/var/run/abrt/abrtd.pid
