@@ -25,6 +25,11 @@ RUN augtool set /files/etc/abrt/abrt-action-save-package-data.conf/OpenGPGCheck 
 # the $PROBLEM_DIR/os_info_in_rootdir file.
 RUN augtool set /files/etc/abrt/abrt.conf/ExploreChroots yes
 
+# Save the process' binary image in the problem data to be able to generate
+# backtrace using local gdb. ABRT needs to run a command like the following
+# one:
+#   $ gdb -c coredump -e binary ...
+RUN augtool set /files/etc/abrt/plugins/CCpp.conf/SaveBinaryImage yes
 
 # Enable additional reporting workflows.
 # Until the issue below is fixed, we must enable events using sed.
